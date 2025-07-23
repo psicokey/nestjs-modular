@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
@@ -10,6 +11,15 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+  const config = new DocumentBuilder()
+    .setTitle('API')
+    .setDescription('Key Store')
+    .setVersion('1.0')
+    .addTag('cats')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, documentFactory);
+  app.enableCors();
   await app.listen(3000);
 }
 bootstrap();
