@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import * as Joi from 'joi';
+import { Client } from 'pg';
 
 import { lastValueFrom } from 'rxjs';
 import { AppController } from './app.controller';
