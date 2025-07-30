@@ -36,3 +36,6 @@ lerna-debug.log*
 *.env
 /postgres_data
 /pgadmin_data
+/mysql_data
+/phpmyadmin_data
+

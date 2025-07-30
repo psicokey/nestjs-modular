@@ -1,4 +1,5 @@
 services:
+
   postgres:
     image: postgres:15
     env_file:
@@ -7,6 +8,11 @@ services:
       - '5432:5432'
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4
@@ -14,5 +20,35 @@ services:
       - .env
     ports:
       - '5050:80'
+    depends_on:
+      - postgres
     volumes:
       - ./pgadmin_data:/var/lib/pgadmin
+
+  mysql:
+    image: mysql:8
+    env_file:
+      - .env
+    ports:
+      - '3307:3306'
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    user: '${UID:-1000}:${GID:-1000}'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', '${MYSQL_USER}', '-p${MYSQL_ROOT_PASSWORD}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - '8080:80'
+    depends_on:
+      - mysql
+    volumes:
+      - ./phpmyadmin_data:/var/lib/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}

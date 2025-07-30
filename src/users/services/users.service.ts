@@ -68,12 +68,12 @@ export class UsersService {
     this.users.splice(index, 1);
     return true;
   }
-  getOrdersByUser(id: number): Order {
+  async getOrdersByUser(id: number): Promise<Order> {
     const User = this.findOne(id);
     return {
       date: new Date(),
       user: User,
-      products: this.productsService.findAll(),
+      products: await this.productsService.findAll(),
     };
   }
   getTasks() {
