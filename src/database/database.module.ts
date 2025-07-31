@@ -16,7 +16,7 @@ import config from 'src/config';
     TypeOrmModule.forRootAsync({
       inject: [config.KEY],
       useFactory: (configService: ConfigType<typeof config>) => {
-        const { username, host, database, password, port } =
+        const { host, port, username, password, database } =
           configService.mysql;
         return {
           type: 'mysql',
@@ -25,7 +25,8 @@ import config from 'src/config';
           username,
           password,
           database,
-          synchronize: true,
+          // ¡Importante! Usar 'false' cuando se trabaja con migraciones
+          synchronize: false,
           autoLoadEntities: true,
         };
       },
@@ -35,10 +36,9 @@ import config from 'src/config';
     {
       provide: 'PG',
       useFactory: (configService: ConfigType<typeof config>) => {
-        const { username, host, database, password, port } =
-          configService.postgres;
+        const { user, host, database, password, port } = configService.postgres;
         const client = new Client({
-          user: username,
+          user,
           host,
           database,
           password,

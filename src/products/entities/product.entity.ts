@@ -1,4 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
+import { Brand } from './brand.entity';
+import { Category } from './category.entity';
 
 @Entity()
 export class Product {
@@ -19,4 +29,20 @@ export class Product {
 
   @Column({ type: 'varchar', length: 255 })
   image: string;
+
+  @ManyToOne(() => Brand, (brand) => brand.products)
+  @JoinColumn({ name: 'brand_id' }) // Especifica que esta es la columna de unión
+  brand: Brand;
+
+  @ManyToMany(() => Category, (category) => category.products)
+  @JoinTable({
+    name: 'product_category', // nombre de la tabla de unión
+    joinColumn: {
+      name: 'product_id',
+    },
+    inverseJoinColumn: {
+      name: 'category_id',
+    },
+  })
+  categories: Category[];
 }
