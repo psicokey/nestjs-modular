@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import * as Joi from 'joi';
-import { Client } from 'pg';
 
 import { lastValueFrom } from 'rxjs';
 import { AppController } from './app.controller';
@@ -24,12 +23,6 @@ import config from './config';
       isGlobal: true,
       validationSchema: Joi.object({
         API_KEY: Joi.string().required(),
-        // PostgreSQL
-        POSTGRES_HOST: Joi.string().required(),
-        POSTGRES_PORT: Joi.number().required(),
-        POSTGRES_USER: Joi.string().required(),
-        POSTGRES_PASSWORD: Joi.string().required(),
-        POSTGRES_DB: Joi.string().required(),
         // MySQL
         MYSQL_HOST: Joi.string().required(),
         MYSQL_PORT: Joi.number().required(),

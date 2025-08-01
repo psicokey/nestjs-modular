@@ -6,6 +6,8 @@ import {
   JoinColumn,
   ManyToMany,
   JoinTable,
+  UpdateDateColumn,
+  CreateDateColumn,
 } from 'typeorm';
 import { Brand } from './brand.entity';
 import { Category } from './category.entity';
@@ -29,6 +31,21 @@ export class Product {
 
   @Column({ type: 'varchar', length: 255 })
   image: string;
+
+  @CreateDateColumn({
+    name: 'create_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
+  createAt: Date;
+
+  @UpdateDateColumn({
+    name: 'update_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
+  })
+  updateAt: Date;
 
   @ManyToOne(() => Brand, (brand) => brand.products)
   @JoinColumn({ name: 'brand_id' }) // Especifica que esta es la columna de unión

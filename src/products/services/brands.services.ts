@@ -11,6 +11,9 @@ export class BrandsService {
       id: 1,
       name: 'Brand 1',
       image: 'https://i.imgur.com/U4iGx1j.jpeg',
+      createAt: new Date(),
+      updateAt: new Date(),
+      products: [],
     },
   ];
 
@@ -31,6 +34,9 @@ export class BrandsService {
     const newBrand = {
       id: this.counterId,
       ...data,
+      createAt: new Date(),
+      updateAt: new Date(),
+      products: [],
     };
     this.brands.push(newBrand);
     return newBrand;
