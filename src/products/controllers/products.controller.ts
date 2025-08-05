@@ -10,18 +10,23 @@ import {
   HttpStatus,
   HttpCode,
 } from '@nestjs/common';
-
+import { Repository } from 'typeorm';
+import { Product } from '../entities/product.entity';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 import { ParseIntPipe } from '../../common/parse-int.pipe';
 import { CreateProductDto, UpdateProductDto } from '../dtos/products.dtos';
 
-import { ProductsService } from './../services/products.service';
+import { BrandsService } from '../services/brands.services';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
-  constructor(private productsService: ProductsService) {}
+  constructor(
+    @InjectRepository(Product) private productRepo: Repository<Product>,
+    private brandsService: BrandsService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'List of products' })
@@ -30,7 +35,7 @@ export class ProductsController {
     @Query('offset') offset = 0,
     @Query('brand') brand: string,
   ) {
-    return this.productsService.findAll(); // Nota: Para usar limit/offset, tu servicio findAll necesitaría aceptarlos.
+    return this.productRepo.find({ relations: ['brand'] });
   }
 
   @Get('filter')
@@ -44,24 +49,39 @@ export class ProductsController {
     // response.status(200).send({
     //   message: `product ${productId}`,
     // });
-    return this.productsService.findOne(productId);
+    return this.productRepo.findOne({
+      where: { id: productId },
+      relations: ['brand'],
+    });
   }
 
   @Post()
-  create(@Body() payload: CreateProductDto) {
-    return this.productsService.create(payload);
+  async create(@Body() payload: CreateProductDto) {
+    const newProduct = this.productRepo.create(payload);
+    if (payload.brandId) {
+      const brand = await this.brandsService.findOne(payload.brandId);
+      newProduct.brand = brand;
+    }
+    return this.productRepo.save(newProduct);
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() payload: UpdateProductDto,
   ) {
-    return this.productsService.update(id, payload);
+    const product = await this.productRepo.findOneBy({ id });
+    if (payload.brandId) {
+      const brand = await this.brandsService.findOne(payload.brandId);
+      product.brand = brand;
+    }
+    this.productRepo.merge(product, payload);
+    return this.productRepo.save(product);
   }
 
   @Delete(':id')
-  delete(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.remove(id);
+  async delete(@Param('id', ParseIntPipe) id: number) {
+    const product = await this.productRepo.findOneBy({ id });
+    return this.productRepo.remove(product);
   }
 }

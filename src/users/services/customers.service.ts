@@ -12,7 +12,7 @@ export class CustomersService {
   ) {}
 
   async findAll() {
-    return await this.customerRepo.find();
+    return this.customerRepo.find();
   }
 
   async findOne(id: number) {
@@ -23,21 +23,21 @@ export class CustomersService {
     return customer;
   }
 
-  create(data: CreateCustomerDto) {
+  async create(data: CreateCustomerDto) {
     const newCustomer = this.customerRepo.create(data);
-    this.customerRepo.save(newCustomer);
-    return newCustomer;
+    return await this.customerRepo.save(newCustomer);
   }
 
   async update(id: number, changes: UpdateCustomerDto) {
     const customer = await this.findOne(id);
-    const index = await this.customerRepo.merge(customer, changes);
-    return this.customerRepo.save(customer);
+    this.customerRepo.merge(customer, changes);
+    return await this.customerRepo.save(customer);
   }
-  remove(id: number) {
-    if (!this.findOne(id))
-      throw new NotFoundException(`Customer #${id} not found`);
-    this.customerRepo.delete(id);
+
+  async remove(id: number) {
+    // findOne ya lanza una excepción si no lo encuentra,
+    // así que no es necesario volver a comprobarlo aquí.
+    await this.findOne(id);
     return this.customerRepo.delete(id);
   }
 }
