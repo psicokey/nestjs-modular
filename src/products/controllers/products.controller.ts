@@ -11,20 +11,22 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Product } from '../entities/product.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
+import { Product } from '../entities/product.entity';
+import { ProductsService } from '../services/products.service'; // Asegúrate que el path es correcto
+import { BrandsService } from '../services/brands.services';
 import { ParseIntPipe } from '../../common/parse-int.pipe';
 import { CreateProductDto, UpdateProductDto } from '../dtos/products.dtos';
-
-import { BrandsService } from '../services/brands.services';
-import { InjectRepository } from '@nestjs/typeorm';
 
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(
-    @InjectRepository(Product) private productRepo: Repository<Product>,
+    private productsService: ProductsService,
+    @InjectRepository(Product)
+    private readonly productRepo: Repository<Product>,
     private brandsService: BrandsService,
   ) {}
 
@@ -33,9 +35,9 @@ export class ProductsController {
   getProducts(
     @Query('limit') limit = 100,
     @Query('offset') offset = 0,
-    @Query('brand') brand: string,
+    @Query('brand') brand?: string,
   ) {
-    return this.productRepo.find({ relations: ['brand'] });
+    return this.productsService.findAll();
   }
 
   @Get('filter')
@@ -46,9 +48,6 @@ export class ProductsController {
   @Get(':productId')
   @HttpCode(HttpStatus.ACCEPTED)
   getOne(@Param('productId', ParseIntPipe) productId: number) {
-    // response.status(200).send({
-    //   message: `product ${productId}`,
-    // });
     return this.productRepo.findOne({
       where: { id: productId },
       relations: ['brand'],
