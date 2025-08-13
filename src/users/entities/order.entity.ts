@@ -11,8 +11,8 @@ import { OrderItem } from './order-item.entity';
 
 @Entity()
 export class Order {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @CreateDateColumn({
     type: 'timestamp',

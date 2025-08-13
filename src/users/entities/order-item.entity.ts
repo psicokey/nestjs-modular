@@ -12,7 +12,7 @@ import { Order } from './order.entity';
 
 @Entity('order_items')
 export class OrderItem {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id: string;
 
   @Column({ type: 'int' })
