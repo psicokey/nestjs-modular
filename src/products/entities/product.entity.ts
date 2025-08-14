@@ -8,13 +8,15 @@ import {
   JoinTable,
   UpdateDateColumn,
   CreateDateColumn,
+  Index,
 } from 'typeorm';
 import { Brand } from './brand.entity';
 import { Category } from './category.entity';
 
-@Entity()
+@Entity('products')
+@Index(['price', 'stock'])
 export class Product {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'product_id' })
   id: number;
 
   @Column({ type: 'varchar', length: 255, unique: true })
@@ -23,6 +25,7 @@ export class Product {
   @Column({ type: 'text' })
   description: string;
 
+  @Index()
   @Column({ type: 'int' })
   price: number;
 

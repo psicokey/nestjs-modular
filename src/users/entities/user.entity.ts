@@ -10,7 +10,7 @@ import {
 
 import { Customer } from './customer.entity';
 
-@Entity()
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -39,6 +39,6 @@ export class User {
   updateAt: Date;
 
   @OneToOne(() => Customer, (customer) => customer.user, { nullable: true })
-  @JoinColumn()
+  @JoinColumn({ name: 'customer_id' }) // Especifica que esta es la columna de unión
   customer: Customer;
 }
