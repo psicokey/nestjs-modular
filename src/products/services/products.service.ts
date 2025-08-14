@@ -4,7 +4,11 @@ import { In, Repository } from 'typeorm';
 
 import { Product } from '../entities/product.entity';
 import { Brand } from '../entities/brand.entity';
-import { CreateProductDto, UpdateProductDto } from '../dtos/products.dtos';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+  FilterProductDto,
+} from '../dtos/products.dtos';
 import { Category } from '../entities/category.entity';
 
 @Injectable()
@@ -15,12 +19,16 @@ export class ProductsService {
     @InjectRepository(Category) private categoryRepo: Repository<Category>,
   ) {}
 
-  findAll() {
-    return this.productRepo.find({
-      relations: ['brand', 'categories'],
-    });
+  findAll(params?: FilterProductDto) {
+    if (params) {
+      const { limit, offset } = params;
+      return this.productRepo.find({
+        relations: ['brand', 'categories'],
+        take: limit,
+        skip: offset,
+      });
+    }
   }
-
   async findOne(id: number) {
     const product = await this.productRepo.findOne({
       where: { id },
